@@ -1,5 +1,5 @@
 <?php
-namespace philwc;
+namespace nyankod;
 
 class JsonDB
 {
@@ -71,7 +71,7 @@ class JsonDB
      * @throws JsonDBException
      */
     public function __call($op, $args) {
-        if ($args && method_exists("philwc\JsonTable", $op)) {
+        if ($args && method_exists("nyankod\JsonTable", $op)) {
             $table = $args[0].$this->fileExt;
             $create = true;
             if($op == "createTable")

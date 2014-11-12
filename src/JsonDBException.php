@@ -4,7 +4,7 @@
  * Date: 08/05/14
  */
 
-namespace philwc;
+namespace nyankod;
 
 
 class JsonDBException extends \Exception

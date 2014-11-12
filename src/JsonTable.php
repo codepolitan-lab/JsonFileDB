@@ -1,5 +1,5 @@
 <?php
-namespace philwc;
+namespace nyankod;
 
 class JsonTable
 {
