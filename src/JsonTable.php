@@ -12,10 +12,10 @@ class JsonTable
     /**
      * @param null $_jsonFile
      */
-    public function __construct($_jsonFile = null)
+    public function __construct($_jsonFile = null, $create = true)
     {
         if ($_jsonFile !== null) {
-            $this->init($_jsonFile);
+            $this->init($_jsonFile, $create);
         }
     }
 
@@ -24,16 +24,18 @@ class JsonTable
      *
      * @throws JsonDBException
      */
-    public function init($_jsonFile)
+    public function init($_jsonFile, $create)
     {
-        if (file_exists($_jsonFile)) {
-            $this->jsonFile = $_jsonFile;
-            $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
-            $this->checkJson();
-            $this->lockFile();
-        } else {
-            throw new JsonDBException('File not found: ' . $_jsonFile);
+        if (! file_exists($_jsonFile)) {
+            if($create === true)
+                $this->createTable($_jsonFile, true);
+            else
+                throw new JsonDBException('File not found: ' . $_jsonFile);
         }
+        $this->jsonFile = $_jsonFile;
+        $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
+        $this->checkJson();
+        $this->lockFile();
 
         $this->prettyOutput = true;
     }
@@ -127,10 +129,9 @@ class JsonTable
         } else {
             $flags = 0;
         }
-
-        if ($this->fileData == null || $this->fileData == '' || empty($this->fileData)) {
-            throw new JsonDBException('Refusing to write null data to: ' . $this->jsonFile);
-        }
+        // if ($this->fileData == null || $this->fileData == '' || empty($this->fileData)) {
+        //     throw new JsonDBException('Refusing to write null data to: ' . $this->jsonFile);
+        // }
 
         ftruncate($this->fileHandle, 0);
         if (fwrite($this->fileHandle, json_encode($this->fileData, $flags))) {
@@ -324,5 +325,17 @@ class JsonTable
         $this->save();
 
         return $result;
+    }
+
+    public function createTable($tablePath) {
+        if(is_array($tablePath)) $tablePath = $tablePath[0];
+
+        if(file_exists($tablePath))
+            throw new JsonDBException("Table already exists: ".$tablePath);
+        
+        elseif(fclose(fopen($tablePath, 'a')))
+            return true;
+        else
+            throw new JsonDBException("New table couldn't be created: ".$tablePath);
     }
 }

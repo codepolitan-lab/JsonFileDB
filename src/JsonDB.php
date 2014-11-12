@@ -52,12 +52,12 @@ class JsonDB
      *
      * @return JsonTable
      */
-    protected function getTableInstance($table)
+    protected function getTableInstance($table, $create)
     {
         if (isset($tables[$table])) {
             return $tables[$table];
         } else {
-            return $tables[$table] = new JsonTable($this->path . $table);
+            return $tables[$table] = new JsonTable($this->path . $table, $create);
         }
     }
 
@@ -70,18 +70,20 @@ class JsonDB
      * @return mixed
      * @throws JsonDBException
      */
-    public function __call($op, $args)
-    {
+    public function __call($op, $args) {
         if ($args && method_exists("philwc\JsonTable", $op)) {
-            $table = $args[0] . $this->fileExt;
-
-            return $this->getTableInstance($table)
-                        ->$op(
-                        $args
-                );
-        } else {
-            throw new JsonDBException('Unknown method or wrong arguments');
-        }
+            $table = $args[0].$this->fileExt;
+            $create = true;
+            if($op == "createTable")
+            {
+                return $this->getTableInstance($table, true);
+            }
+            elseif($op == "insert" && isset($args[2]) && $args[2] === false)
+            {
+                $create = false;
+            }
+            return $this->getTableInstance($table, $create)->$op($args);
+        } else throw new JsonDBException("JsonDB Error: Unknown method or wrong arguments ");
     }
 
     /**
