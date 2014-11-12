@@ -1,5 +1,5 @@
 {
-    "name": "nyankod/jsondb",
+    "name": "nyankod/jsonfiledb",
     "description": "json database library for PHP",
     "license": "MIT",
     "authors": [
