@@ -49,7 +49,6 @@ class JsonFileDB
 
         $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
         $this->checkJson();
-        $this->lockFile();
 
         $this->prettyOutput = true;
     }
@@ -59,8 +58,10 @@ class JsonFileDB
      */
     public function __destruct()
     {
-        flock($this->fileHandle, LOCK_UN);
-        fclose($this->fileHandle);
+        if($this->fileHandle){   
+            flock($this->fileHandle, LOCK_UN);
+            fclose($this->fileHandle);
+        }
     }
 
     /**
@@ -143,6 +144,9 @@ class JsonFileDB
         } else {
             $flags = 0;
         }
+        
+        $this->lockFile();
+
         // if ($this->fileData == null || $this->fileData == '' || empty($this->fileData)) {
         //     throw new JsonDBException('Refusing to write null data to: ' . $this->jsonFile);
         // }
