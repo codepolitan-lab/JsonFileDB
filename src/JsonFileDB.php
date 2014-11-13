@@ -1,7 +1,8 @@
-<?php
-namespace nyankod;
+<?php 
 
-class JsonTable
+namespace Nyankod;
+
+class JsonFileDB
 {
 
     protected $jsonFile;
