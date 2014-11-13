@@ -5,35 +5,48 @@ namespace Nyankod;
 class JsonFileDB
 {
 
+    protected $jsonPath;
     protected $jsonFile;
     protected $fileHandle;
     protected $fileData = array();
     protected $prettyOutput;
+    protected $dbExt;
 
     /**
-     * @param null $_jsonFile
+     * @param null $_jsonPath
      */
-    public function __construct($_jsonFile = null, $create = true)
+    public function __construct($_jsonPath = false, $_ext = '.json')
     {
-        if ($_jsonFile !== null) {
-            $this->init($_jsonFile, $create);
+        $this->setPath($_jsonPath);
+        $this->setExt($_ext);
+    }
+
+    public function setPath($_jsonPath)
+    {
+        if ($_jsonPath) {
+            $this->jsonPath = $_jsonPath;
+        } else {
+            throw new JsonDBException('Error. Please supply a database location path');
         }
     }
 
+    public function setExt($_ext = '.json')
+    {
+        if ($_ext) $this->dbExt = $_ext;
+    }
+
     /**
-     * @param $_jsonFile
+     * @param $_jsonPath
      *
      * @throws JsonDBException
      */
-    public function init($_jsonFile, $create)
+    public function setTable($table = false)
     {
-        if (! file_exists($_jsonFile)) {
-            if($create === true)
-                $this->createTable($_jsonFile, true);
-            else
-                throw new JsonDBException('File not found: ' . $_jsonFile);
-        }
-        $this->jsonFile = $_jsonFile;
+        $this->jsonFile = $this->jsonPath.$table.$this->dbExt;
+        
+        if (! file_exists($this->jsonFile))
+            $this->createTable($this->jsonFile);
+
         $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
         $this->checkJson();
         $this->lockFile();
