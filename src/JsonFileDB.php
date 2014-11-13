@@ -44,13 +44,16 @@ class JsonFileDB
     {
         $this->jsonFile = $this->jsonPath.$table.$this->dbExt;
         
+        $create = false;
         if (! file_exists($this->jsonFile))
-            $this->createTable($this->jsonFile);
+            $create = $this->createTable($this->jsonFile);
 
         $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
         $this->checkJson();
 
         $this->prettyOutput = true;
+
+        return $create;
     }
 
     /**
@@ -58,8 +61,7 @@ class JsonFileDB
      */
     public function __destruct()
     {
-        if($this->fileHandle){   
-            flock($this->fileHandle, LOCK_UN);
+        if($this->fileHandle){
             fclose($this->fileHandle);
         }
     }
@@ -154,7 +156,7 @@ class JsonFileDB
         ftruncate($this->fileHandle, 0);
         if (fwrite($this->fileHandle, json_encode($this->fileData, $flags))) {
             fflush($this->fileHandle);
-
+            flock($this->fileHandle, LOCK_UN);
             return true;
         } else {
             throw new JsonDBException('Can\'t write data to: ' . $this->jsonFile);
@@ -348,10 +350,10 @@ class JsonFileDB
     public function createTable($tablePath) {
         if(is_array($tablePath)) $tablePath = $tablePath[0];
 
-        if(file_exists($tablePath))
-            throw new JsonDBException("Table already exists: ".$tablePath);
-        
-        elseif(fclose(fopen($tablePath, 'a')))
+        $file = fopen($tablePath, 'a');
+        fwrite($file, "[\n\n]");
+
+        if(fclose($file))
             return true;
         else
             throw new JsonDBException("New table couldn't be created: ".$tablePath);
