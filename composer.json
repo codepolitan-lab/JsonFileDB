@@ -1,8 +1,8 @@
 {
-    "name": "nyankod/jsonfiledb",
+    "name": "codepolitan-lab/jsonfiledb",
     "description": "json database library for PHP",
     "keywords": ["database", "db", "json"],
-    "homepage": "https://github.com/nyankod/JsonFileDB",
+    "homepage": "https://github.com/codepolitan-lab/JsonFileDB",
     "license": "MIT",
     "authors": [
         {
